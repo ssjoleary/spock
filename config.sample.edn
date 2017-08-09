@@ -1,0 +1,11 @@
+{:server         {:host "localhost"
+                  :port 3000
+                  :path "/"}
+ :spotify-oauth2 {:client-id     "CLIENT-ID"
+                  :client-secret "CLIENT_SECRET"
+                  :auth-url      "https://accounts.spotify.com/authorize"
+                  :access-uri    "https://accounts.spotify.com/api/token"
+                  :callback      {:domain "http://localhost:3000" ;; replace this for production with the appropriate site URL
+                                  :path "/oauthcallback"}}
+ :mpd            {:host "127.0.0.1"
+                  :port 6600}}
