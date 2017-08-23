@@ -5,19 +5,10 @@
             [config.core :refer [env]]
             [mpd-clj.core :as mpd]
             [spock.auth :as auth]
+            [spock.mpd :as s-mpd]
             [taoensso.timbre :as log]))
 
 (def api-url "https://api.spotify.com/v1/me")
-
-(defn get-mpd-connection
-  [mpd]
-  (log/info "Get Mpd Connection")
-  (if (= (mpd/status mpd) false)
-    (do
-      (log/info "Status was false")
-      (mpd/client {:host (get-in env [:mpd :host])
-                   :port (get-in env [:mpd :port])}))
-    mpd))
 
 (defn get-currently-playing-spot-api
   []
@@ -54,42 +45,47 @@
   [response-url]
   (client/post response-url
                {:form-params
-                {:text "Available Commands:\nwhats playing\npause\nresume"
+                {:text "Available Commands:\nwhats-playing\npause\nresume"
                  :response_type "ephemeral"}
                 :content-type :json})
   nil)
 
 (defn get-currently-playing
-  [mpd request])
+  [mpd]
+  (let [response (mpd/currentsong mpd)
+        artist   (:Artist response)
+        song     (:Title response)
+        album    (:Album response)]
+    (log/info response)
+    (str "Playing " song " by " artist " from " album)))
 
 (defn pause-playback
   [mpd]
-  (log/info (mpd/stats mpd))
-  (log/info (mpd/status mpd))
   (log/info (mpd/pause mpd))
   "Playback paused")
 
 (defn resume-playback
   [mpd]
-  (log/info (mpd/stats mpd))
-  (log/info (mpd/status mpd))
   (log/info (mpd/resume mpd))
   "Playback resumed")
 
 (defn delegate
   [mpd command response-url]
+  (log/info "mpd-client: " mpd)
   (case command
-    :whats-playing (get-currently-playing)
+    :whats-playing (get-currently-playing mpd)
     :pause         (pause-playback mpd)
     :resume        (resume-playback mpd)
     (send-help response-url)))
 
 (defn spotify-handler
   [mpd request]
+  (log/info "Spotify handler")
+  (s-mpd/check-connection! mpd)
   (let [form-params      (:form-params request)
         response-url     (get form-params "response_url")
         command          (->kebab-case-keyword (get form-params "text"))
-        mpd-client       (get-mpd-connection mpd)
+        mpd-client       @@mpd
         spotify-response (delegate mpd-client command response-url)]
     (when-not (nil? spotify-response)
       (client/post response-url

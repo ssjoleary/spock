@@ -8,7 +8,8 @@
             [spock.spotify.handlers :as spotify]
             [ring.middleware.defaults :refer [wrap-defaults api-defaults]]
             [ring.util.response :as response]
-            [schema.core :as s]))
+            [schema.core :as s]
+            [taoensso.timbre :as log]))
 
 (defn app
   [components]
@@ -29,8 +30,10 @@
       (GET "/ping" []
         (-> (response/response "pong")
             (response/content-type "text/plain; charset=UTF-8"))))
+
     (POST "/spock" request
       :components [mpd]
+      (log/info "Route handler")
       (-> (spotify/spotify-handler mpd request)
           response/response))
 

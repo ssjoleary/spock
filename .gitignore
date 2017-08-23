@@ -13,7 +13,5 @@ pom.xml.asc
 .lein-failures
 .nrepl-port
 /dev/resources
-/resources/prod
-/resources/staging
-/resources/test
+/resources/
 /tmp

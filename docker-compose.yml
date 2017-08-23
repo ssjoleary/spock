@@ -1,18 +1,10 @@
 mopice:
-  image: ssjoleary/mopice:0.0.1
+  image: ssjoleary/mopice:0.1.0
   ports:
     - "8000:8000"
     - "6600:6600"
     - "6680:6680"
   volumes:
-    - ./resources/prod/mopidy.conf:/var/lib/mopidy/.config/mopidy/mopidy.conf
-    - ./resources/prod/silence.ogg:/usr/share/icecast/silence.ogg
-    - ./resources/prod/icecast.xml:/usr/share/icecast/icecast.xml
-
-nginx:
-  image: nginx:stable-alpine
-  volumes:
-    - ./tmp/nginx/nginx.conf:/etc/nginx/nginx.conf
-    - ./tmp/nginx/logs:/var/log/nginx
-  ports:
-    - 3380:80
+    - ./resources/mopidy.conf:/var/lib/mopidy/.config/mopidy/mopidy.conf
+    - ./resources/silence.mp3:/usr/share/icecast/silence.mp3
+    - ./resources/icecast.xml:/usr/share/icecast/icecast.xml

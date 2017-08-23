@@ -1,6 +1,7 @@
 (ns spock.system
   (:require [com.stuartsierra.component :as component]
             [mpd-clj.core :as mpd]
+            [spock.mpd :as s-mpd]
             [spock.routes :as r]
             [immutant.web :as web]
             [taoensso.timbre :as log]))
@@ -40,8 +41,7 @@
   (-> (component/system-map
        :app    (->App r/app)
        :server (->ImmutantWebServer server)
-       :mpd    (mpd/client {:host (:host mpd)
-                            :port (:port mpd)}))
+       :mpd    s-mpd/mpd-connection)
       (component/system-using
        {:app    [:mpd]
         :server [:app]})))
